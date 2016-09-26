@@ -52,6 +52,8 @@ for commit_group in splitted_output:
                 'counters': defaultdict(int),
                 'lists': defaultdict(list)
             }
+        }
+
 
 def computeMetrics(counter, commit_author):
     total_contributors = len(counter)
@@ -62,14 +64,14 @@ def computeMetrics(counter, commit_author):
     major_contributors = sum(1 for author, value in counter.items()
                              if value/total_value >= 0.05)
 
-    commit_author_ratio =
+    commit_author_ratio = \
         counter[commit_author]/total_value if commit_author in counter else 0
 
     max_value_contributor = max(counter.keys(), key=(lambda k: counter[k]))
 
     ownership_best_contributor = counter[max_value_contributor] / total_value
 
-    commit_author_is_best_contributor =
+    commit_author_is_best_contributor = \
         True if max_value_contributor == commit_author else False
 
     return {
@@ -210,8 +212,8 @@ for commit in commits_3rd_step:
 
                 if n_lines != 0:
                     end_line = start_line + n_lines \
-                    if n_lines \
-                    else start_line
+                        if n_lines \
+                        else start_line
 
                     removed_lines_ranges.append((start_line, end_line))
 
