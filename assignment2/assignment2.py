@@ -347,7 +347,7 @@ with open('datacollection.csv', 'w', newline='') as csvfile:
 
             fix_commits_hash = ','.join(bugs_lists['fix_commits_hashes'])
             fix_commits_timestamp = \
-                ','.join(bugs_lists['fix_commits_timestamp'])
+                ','.join(bugs_lists['fix_commits_tstamps'])
         else:
             bugs_induced_qty = 0
             post_release_bugs, dev_time_bugs = '', ''
