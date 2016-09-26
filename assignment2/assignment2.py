@@ -2,6 +2,7 @@ import sh  # to interact with the shell
 import re  # for regular expressions
 import requests  # to download JIRA Bug list
 import csv  # to save the results
+import time
 from collections import Counter, defaultdict  # useful structures
 
 git = sh.git.bake(_cwd='lucene-solr')
@@ -132,7 +133,7 @@ for ((commit_hash, file_path), info) in struct.items():
 
     # if the file was created in the commit that we're analyzing, the output
     # will be empty. in that case we leave the commit metrics empty
-    if contributors == '':
+    if not contributors:
         continue
 
     # last item is always an empty string
@@ -161,15 +162,35 @@ commits_3rd_step = ({'title': commit[52:],
                      'tstamp': commit[:10]}
                     for commit in raw_revlist_output.split('\n')[:-1])
 
-jira_bugs_json_url = 'https://issues.apache.org/jira/rest/api/2/search?jql='\
-                     'project%20%3D%20LUCENE%20AND%20issuetype%20%3D%20Bug'
+# we have to get from the Jira REST API the lists of issue IDs that
+# correspond to a bug. the API allows the retrieval of only 100
+# results at time, meaning we have to repeat the request multiple
+# times in order to get all the issue IDs
+jira_api_url = 'https://issues.apache.org/jira/rest/api/2/search'
 
-jira_bugs_json = requests.get(jira_bugs_json_url).json()
+payload = {
+    'jql': 'project = LUCENE AND issuetype = Bug',
+    'fields': ['key']
+}
+first_results = requests.post(jira_api_url, json=payload).json()
+maxResults = first_results['maxResults']
+total = first_results['total']
 
 # we store in a list the issue IDs that correspond to a bug
 bugs_issue_ids = []
-for issue in jira_bugs_json['issues']:
-    bugs_issue_ids.append(issue['key'])
+
+for startAt in range(0, total, maxResults):
+    payload = {
+        'jql': 'project = LUCENE AND issuetype = Bug',
+        'fields': ['key'],
+        'startAt': startAt
+    }
+    results = requests.post(jira_api_url, json=payload).json()
+
+    for issue in results['issues']:
+        bugs_issue_ids.append(issue['key'])
+
+    time.sleep(5)  # in order not to trigger the rate limiter
 
 for commit in commits_3rd_step:
     post_release_bugs, dev_time_bugs = 0, 0
