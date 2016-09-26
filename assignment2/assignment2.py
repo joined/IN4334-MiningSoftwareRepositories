@@ -7,6 +7,9 @@ from collections import Counter, defaultdict
 
 git = sh.git.bake(_cwd='lucene-solr')
 
+# we are interested only in Java files inside the core
+core_regex = r'^lucene\/core\/src\/java\/org\/apache\/lucene.*?\.java$'
+
 #########################################
 # 1ST STEP ##############################
 #########################################
@@ -39,21 +42,16 @@ for commit_group in splitted_output:
     commit_hash, author_date, author_email = commit_info.split(',')
 
     changed_files = commit_group[i+1:]
-
-    # we are interested only in Java files inside the core
-    core_regex = r'^lucene\/core\/src\/java\/org\/apache\/lucene.*?\.java$'
+    changed_files = filter(lambda f: re.search(core_regex, f), changed_files)
 
     for file_path in changed_files:
-        if file_path and re.search(core_regex, file_path):
-            struct[(commit_hash, file_path)] = {
-                'author_date': author_date,
-                'author_email': author_email,
-                'bugs_info': {
-                    'counters': defaultdict(int),
-                    'lists': defaultdict(list)
-                }
+        struct[(commit_hash, file_path)] = {
+            'author_date': author_date,
+            'author_email': author_email,
+            'bugs_info': {
+                'counters': defaultdict(int),
+                'lists': defaultdict(list)
             }
-
 
 def computeMetrics(counter, commit_author):
     total_contributors = len(counter)
@@ -64,14 +62,14 @@ def computeMetrics(counter, commit_author):
     major_contributors = sum(1 for author, value in counter.items()
                              if value/total_value >= 0.05)
 
-    commit_author_ratio = \
+    commit_author_ratio =
         counter[commit_author]/total_value if commit_author in counter else 0
 
     max_value_contributor = max(counter.keys(), key=(lambda k: counter[k]))
 
     ownership_best_contributor = counter[max_value_contributor] / total_value
 
-    commit_author_is_best_contributor = \
+    commit_author_is_best_contributor =
         True if max_value_contributor == commit_author else False
 
     return {
@@ -186,6 +184,9 @@ for commit in commits_3rd_step:
         changed_files = git('--no-pager', 'show', '--name-only', '--pretty=',
                             commit['hash']).split('\n')[:-1]
 
+        changed_files = filter(lambda f: re.search(core_regex, f),
+                               changed_files)
+
         for file_path in changed_files:
             # after getting the list of files changed by the commit that
             # we know that fixes some bugs, we need to know for each file
@@ -209,8 +210,8 @@ for commit in commits_3rd_step:
 
                 if n_lines != 0:
                     end_line = start_line + n_lines \
-                        if n_lines \
-                        else start_line
+                    if n_lines \
+                    else start_line
 
                     removed_lines_ranges.append((start_line, end_line))
 
