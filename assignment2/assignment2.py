@@ -159,8 +159,6 @@ bugs_issue_ids = []
 for issue in jira_bugs_json['issues']:
     bugs_issue_ids.append(issue['key'])
 
-print(bugs_issue_ids)
-
 counter_3 = 0
 for commit in commits_3rd_step:
     print("Counter 3: {}".format(counter_3))
