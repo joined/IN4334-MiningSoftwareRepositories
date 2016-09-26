@@ -171,14 +171,16 @@ for commit in commits_3rd_step:
 
     if jira_match and jira_match.group() in bugs_issue_ids:
         post_release_bug = 1
+    else:
+        keywords = ('error', 'bug', 'fix', 'issue', 'mistake', 'incorrect',
+                    'fault', 'defect', 'flaw', 'typo')
 
-    keywords = ('error', 'bug', 'fix', 'issue', 'mistake', 'incorrect',
-                'fault', 'defect', 'flaw', 'typo')
-
-    if any(keyword in commit['title'] for keyword in keywords):
-        dev_time_bug = 1
+        if any(keyword in commit['title'] for keyword in keywords):
+            dev_time_bug = 1
 
     bugs_induced_qty = dev_time_bug + post_release_bug
+
+    # PRECEDENCE TO JIRA
 
     if bugs_induced_qty > 0:
         changed_files = git('--no-pager', 'show', '--name-only', '--pretty=',
@@ -246,12 +248,12 @@ for commit in commits_3rd_step:
                     bugs_counters = bugs_info['counters']
                     bugs_lists = bugs_info['lists']
 
-                    bugs_counters['dev_time_bug'] += 1
-                    bugs_counters['post_release_bug'] += 1
-                    bugs_counters['bugs_induced_qty'] += 1
+                    bugs_counters['dev_time_bug'] += dev_time_bug
+                    bugs_counters['post_release_bug'] += post_release_bug
+                    bugs_counters['bugs_induced_qty'] += bugs_induced_qty
 
-                    bugs_lists['fix_commits_hashes'] += commit['hash']
-                    bugs_lists['fix_commits_tstamps'] += commit['tstamp']
+                    bugs_lists['fix_commits_hashes'].append(commit['hash'])
+                    bugs_lists['fix_commits_tstamps'].append(commit['tstamp'])
 
 #########################################
 # 4TH STEP ##############################
