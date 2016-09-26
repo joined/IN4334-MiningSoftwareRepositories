@@ -60,9 +60,9 @@ def computeMetrics(counter, commit_author):
     total_value = sum(counter.values())
 
     minor_contributors = sum(1 for author, value in counter.items()
-                             if value/total_value < 0.05)
+                             if value/total_value <= 0.05)
     major_contributors = sum(1 for author, value in counter.items()
-                             if value/total_value >= 0.05)
+                             if value/total_value > 0.05)
 
     commit_author_ratio = \
         counter[commit_author]/total_value if commit_author in counter else 0
