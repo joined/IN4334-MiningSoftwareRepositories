@@ -149,24 +149,17 @@ commits_3rd_step = ({'title': commit[52:],
                      'tstamp': commit[:10]}
                     for commit in raw_revlist_output.split('\n')[:-1])
 
-id_type_cache = {}
+jira_bugs_json_url = 'https://issues.apache.org/jira/rest/api/2/search?jql='\
+                     'project%20%3D%20LUCENE%20AND%20issuetype%20%3D%20Bug'\
+                     '%20ORDER%20BY%20priority%20DESC'
 
+jira_bugs_json = requests.get(jira_bugs_json_url).json()
 
-def isJiraBug(issue_id):
-    if issue_id in id_type_cache:
-        return True if id_type_cache[issue_id] == 'Bug' else False
+bugs_issue_ids = []
+for issue in jira_bugs_json['issues']:
+    bugs_issue_ids.append(issue['key'])
 
-    base_url_jira_api = 'https://issues.apache.org/jira/rest/api/latest/issue/'
-
-    issue_res = requests.get(base_url_jira_api + issue_id)
-
-    if issue_res.status_code == 200:
-        issue_type = issue_res.json()['fields']['issuetype']['name']
-        id_type_cache[issue_id] = issue_type
-
-        return True if issue_type == 'Bug' else False
-    else:
-        return False
+print(bugs_issue_ids)
 
 counter_3 = 0
 for commit in commits_3rd_step:
@@ -178,7 +171,7 @@ for commit in commits_3rd_step:
 
     jira_match = re.search(r'LUCENE-\d{1,4}', commit['title'])
 
-    if jira_match and isJiraBug(jira_match.group()):
+    if jira_match and jira_match.group() in bugs_issue_ids:
         post_release_bug = 1
 
     keywords = ('error', 'bug', 'fix', 'issue', 'mistake', 'incorrect',
