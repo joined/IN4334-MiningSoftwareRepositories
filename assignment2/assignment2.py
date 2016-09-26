@@ -248,8 +248,8 @@ for commit in commits_3rd_step:
                     bugs_counters = bugs_info['counters']
                     bugs_lists = bugs_info['lists']
 
-                    bugs_counters['dev_time_bug'] += dev_time_bug
-                    bugs_counters['post_release_bug'] += post_release_bug
+                    bugs_counters['dev_time_bugs'] += dev_time_bug
+                    bugs_counters['post_release_bugs'] += post_release_bug
                     bugs_counters['bugs_induced_qty'] += bugs_induced_qty
 
                     bugs_lists['fix_commits_hashes'].append(commit['hash'])
