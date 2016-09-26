@@ -180,8 +180,6 @@ for commit in commits_3rd_step:
 
     bugs_induced_qty = dev_time_bug + post_release_bug
 
-    # PRECEDENCE TO JIRA
-
     if bugs_induced_qty > 0:
         changed_files = git('--no-pager', 'show', '--name-only', '--pretty=',
                             commit['hash']).split('\n')[:-1]
