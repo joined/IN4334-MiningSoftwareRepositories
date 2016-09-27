@@ -311,7 +311,7 @@ for commit in commits_3rd_step:
 # 4TH STEP ##############################
 #########################################
 
-with open('datacollection.csv', 'w', newline='') as csvfile:
+with open('assignment2.csv', 'w', newline='') as csvfile:
     fieldnames = ['commit_hash',
                   'file_name',
                   'directory_name',
@@ -335,7 +335,7 @@ with open('datacollection.csv', 'w', newline='') as csvfile:
                   'fix_commits_hash',
                   'fix_commits_timestamp']
 
-    writer = csv.DictWriter(csvfile, fieldnames=fieldnames, delimiter=';')
+    writer = csv.DictWriter(csvfile, fieldnames=fieldnames, delimiter=',')
 
     writer.writeheader()
 
@@ -392,7 +392,7 @@ with open('datacollection.csv', 'w', newline='') as csvfile:
 
             fix_commits_hash = '|'.join(bugs_lists['fix_commits_hashes'])
             fix_commits_timestamp = \
-                ','.join(bugs_lists['fix_commits_tstamps'])
+                '|'.join(bugs_lists['fix_commits_tstamps'])
         else:
             bugs_induced_qty = 0
             post_release_bugs, dev_time_bugs = '', ''
