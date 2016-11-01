@@ -10,24 +10,17 @@
 
 args = commandArgs(trailingOnly=TRUE)
 
-if (length(args) == 2) {
-  # Read the training and test data
+if (length(args) == 1){
   train <- read.csv(args[1],header=T)
-  test <- read.csv(args[2],header=T) 
-} else if (length(args) == 1){
-  # read the input data
-  data <- read.csv(args[1],header=T)
-  # Get training and test data
-  train <- data[data$bug_discovered_after_next_release == "False",]
-  test <- data[data$bug_discovered_after_next_release == "True",]
+  test <- read.csv(args[1],header=T)
 }
 
 #"/home/bobim/Documents/TUDelft/msr/R_code/release-2.4.1.csv"
 #"/home/bobim/Documents/TUDelft/msr/R_code/release-2.5.0.csv"
 
 # Make the the buggy coulmns binary
-train$buggy = ifelse(train$buggy == "True",1,0);
-test$buggy = ifelse(test$buggy == "True",1,0);
+train$buggy = ifelse(train$buggy == "True" & train$bug_discovered_after_next_release == "False", 1, 0);
+test$buggy = ifelse(test$buggy == "True", 1, 0);
 
 # Build a logistic regression model
 model <- glm(buggy ~ comm + adev + ddev, data = train , family = binomial(link = "logit"))
