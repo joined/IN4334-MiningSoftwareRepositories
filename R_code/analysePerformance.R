@@ -1,5 +1,6 @@
 # Usage: 
 #   Rscript <file name> <training data> <test data>  > performace.txt
+# or Rscript <file name> <data> > performace.txt
 #Output example:
 #   Accuracy 0.9814781 
 #   Recall 0.07142857 
@@ -9,26 +10,27 @@
 
 args = commandArgs(trailingOnly=TRUE)
 
-if (length(args)<2) {
-  stop("Provide the training and testing set", call.=FALSE)
+if (length(args) == 2) {
+  # Read the training and test data
+  train <- read.csv(args[1],header=T)
+  test <- read.csv(args[2],header=T) 
+} else if (length(args) == 1){
+  # read the input data
+  data <- read.csv(args[1],header=T)
+  # Get training and test data
+  train <- data[data$bug_discovered_after_next_release == "False",]
+  test <- data[data$bug_discovered_after_next_release == "True",]
 }
 
 #"/home/bobim/Documents/TUDelft/msr/R_code/release-2.4.1.csv"
 #"/home/bobim/Documents/TUDelft/msr/R_code/release-2.5.0.csv"
 
-
-# Read training data
-train <- read.csv(args[1],header=T)
-# Make the the buggy coulmn binary
+# Make the the buggy coulmns binary
 train$buggy = ifelse(train$buggy == "True",1,0);
-
-# Read test data
-test <- read.csv(args[2],header=T) 
-# Make the the buggy coulmn binary
 test$buggy = ifelse(test$buggy == "True",1,0);
 
 # Build a logistic regression model
-model <- glm(buggy ~ line_contributors_total+line_contributors_minor+line_contributors_major+line_contributors_ownership, data = train , family = binomial(link = "logit"))
+model <- glm(buggy ~ comm + adev + ddev, data = train , family = binomial(link = "logit"))
 
 # Get labels for test data using the LR model
 result <- predict(model,newdata=test,type='response')
