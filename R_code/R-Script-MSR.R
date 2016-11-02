@@ -80,7 +80,7 @@ auc <- auc@y.values[[1]]
 #cat("AUC", auc, "\n")
 
 #compute the coefficients
-#coef = summary(model)$coefficients
+coef = summary(model)$coefficients
 #coef
 
 aucL[i]<-auc
@@ -90,9 +90,12 @@ fL[i]<-F1
 aucMean = mean(unlist(aucL))
 f1Mean = mean(unlist(fL))
 #List with the AUC of all projects
-aucProjects[j] <-aucMean
+aucProjects[j] <- aucMean
 
 #List with the F1 of all projects
-f1Projects[j] <-f1Mean
+f1Projects[j] <- f1Mean
 cat("PROJECT: ",project.names[j], " has AUC (mean): ", aucProjects[[j]]," and", " F1 (mean): ", f1Projects[[j]],"\n")
 }
+
+#dataframe with nameOfProject, AUC, F1
+result <- data.frame(project.names, unlist(aucProjects), unlist(f1Projects))
