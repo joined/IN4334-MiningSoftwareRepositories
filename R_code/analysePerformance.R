@@ -7,6 +7,15 @@
 #   Precision 0.2 
 #   F1 0.1052632 
 #   AUC 0.7074168
+#               Estimate Std. Error       z value  Pr(>|z|)
+#(Intercept) -2.656607e+01   5108.510 -5.200355e-03 0.9958507
+#comm         5.654702e-17    734.633  7.697315e-20 1.0000000
+#adev        -4.296056e-15   1795.783 -2.392303e-18 1.0000000
+
+#If we have more metrics, they will be included above. The significance of each coef 
+#depends on its p-value. If its p-value is less than 0.05 the coef. is considered
+#as significant. More specifically:
+#Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
 
 args = commandArgs(trailingOnly=TRUE)
 
@@ -65,3 +74,8 @@ prf <- performance(pr, measure = "tpr", x.measure = "fpr")
 auc <- performance(pr, measure = "auc")
 auc <- auc@y.values[[1]]
 cat("AUC", auc, "\n")
+
+#compute the coefficients
+coef = summary(model)$coefficients
+coef
+
