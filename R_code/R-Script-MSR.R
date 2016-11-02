@@ -5,12 +5,25 @@
 # At the end it computes the mean of AUC and F1 of all the releases
 #of this project.
 
-path = "/home/bill/msr/project/"
+
+aucL <- list()
+fL <- list()
+aucProjects <- list()
+f1Projects <- list()
+
+#path of the folder with the projects
+pathProject = "/home/bill/msr/allProjects/"
+project.names <- dir(pathProject)
+
+for(j in 1:length(project.names)){
+path = paste(pathProject,project.names[j],"/", sep="")
 file.names <- dir(path, pattern =".csv") #Takes the files in an alphabetically order
 
 for(i in 2:length(file.names)-1){
   release1 <- file.names[i]
   release2 <- file.names[i+1]
+  
+cat("PROJECT:",project.names[j],"\n")
   
 cat("Training:" , release1, "\n","Test:", release2, "\n")
 
@@ -38,14 +51,14 @@ result_labels <- ifelse(result > 0.5, 1,0)
 
 # Calculate the accuracy
 accuracy <- mean(result_labels == test$buggy)
-cat("Accuracy", accuracy, "\n")
+#cat("Accuracy", accuracy, "\n")
 
 # Recall and Precision
 myrecall = sum(result_labels == test$buggy & test$buggy==1)/ sum(test$buggy==1)
 myprecision = sum(result_labels == test$buggy & test$buggy==1) / sum(result_labels==1)
 
-cat("Recall", myrecall, "\n")
-cat("Precision", myprecision, "\n")
+#cat("Recall", myrecall, "\n")
+#cat("Precision", myprecision, "\n")
 
 # F1 metric
 F1 <- (2 * myprecision * myrecall) / (myprecision + myrecall)
@@ -60,11 +73,11 @@ pr <- prediction(result, test$buggy)
 prf <- performance(pr, measure = "tpr", x.measure = "fpr")
 # Plot the ROC curve
 # plot(prf)
-
+ 
 # Compute the area under the curve
 auc <- performance(pr, measure = "auc")
 auc <- auc@y.values[[1]]
-cat("AUC", auc, "\n")
+#cat("AUC", auc, "\n")
 
 #compute the coefficients
 #coef = summary(model)$coefficients
@@ -76,5 +89,10 @@ fL[i]<-F1
 
 aucMean = mean(unlist(aucL))
 f1Mean = mean(unlist(fL))
-aucMean
-f1Mean
+#List with the AUC of all projects
+aucProjects[j] <-aucMean
+
+#List with the F1 of all projects
+f1Projects[j] <-f1Mean
+cat("PROJECT: ",project.names[j], " has AUC (mean): ", aucProjects[[j]]," and", " F1 (mean): ", f1Projects[[j]],"\n")
+}
