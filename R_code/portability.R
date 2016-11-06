@@ -14,7 +14,8 @@ tempor <- data.frame(train=character(),
                  myrecall=double(),
                  myprecision=double(),
                  f1=double(),
-                 auc=double()) 
+                 auc=double(),
+                 test=character()) 
 
 
 aucL <- list()
@@ -36,7 +37,7 @@ delProjects <- list()
 pathProject = "C:/Users/harri/Desktop/Master/Mining/projects/"
 project.names <- dir(pathProject)
 
-path1 = paste(pathProject,project.names[5],"/", sep="")
+path1 = paste(pathProject,project.names[6],"/", sep="")
 path2 = paste(pathProject,project.names[3],"/", sep="")
 
 
@@ -62,7 +63,7 @@ train$buggy = ifelse(train$buggy == "True" & train$bug_discovered_after_next_rel
 test$buggy = ifelse(test$buggy == "True", 1, 0);
 
 # Build a logistic regression model
-model <- glm(buggy ~ comm  + add + del, data = train , family = binomial(link = "logit"))
+model <- glm(buggy ~ comm + add + del, data = train , family = binomial(link = "logit"))
 
 # Get labels for test data using the LR model
 result <- predict(model,newdata=test,type='response')
@@ -119,41 +120,52 @@ camel12 <- data.frame(project="camel",
                          auc=mean(tempor$auc,na.rm = TRUE),
                         test="high") 
 
-continuum12 <- data.frame(project="continuum",
+hadoop12 <- data.frame(project="hadoop",
                      gini="low",
                      accuracy=mean(tempor$accuracy,na.rm = TRUE), 
                      myrecall=mean(tempor$myrecall,na.rm = TRUE),
                      myprecision=mean(tempor$myprecision,na.rm = TRUE),
                      f1=mean(tempor$f1,na.rm = TRUE),
                      auc=mean(tempor$auc,na.rm = TRUE),
-                     test="low") 
+                     test="low")
 
-hadoop12 <- data.frame(project="hadoop",
-                        gini="low",
-                        accuracy=mean(tempor$accuracy,na.rm = TRUE), 
-                        myrecall=mean(tempor$myrecall,na.rm = TRUE),
-                        myprecision=mean(tempor$myprecision,na.rm = TRUE),
-                        f1=mean(tempor$f1,na.rm = TRUE),
-                        auc=mean(tempor$auc,na.rm = TRUE),
-                       test="low")
+
 
 isis12 <- data.frame(project="isis",
-                     gini="high",
+                       gini="high",
+                       accuracy=mean(tempor$accuracy,na.rm = TRUE), 
+                       myrecall=mean(tempor$myrecall,na.rm = TRUE),
+                       myprecision=mean(tempor$myprecision,na.rm = TRUE),
+                       f1=mean(tempor$f1,na.rm = TRUE),
+                       auc=mean(tempor$auc,na.rm = TRUE),
+                       test="high")
+
+jackrabbit12 <- data.frame(project="jackrabbit",
+                      gini="low",
+                      accuracy=mean(tempor$accuracy,na.rm = TRUE), 
+                      myrecall=mean(tempor$myrecall,na.rm = TRUE),
+                      myprecision=mean(tempor$myprecision,na.rm = TRUE),
+                      f1=mean(tempor$f1,na.rm = TRUE),
+                      auc=mean(tempor$auc,na.rm = TRUE),
+                      test="low")
+
+ofbiz12 <- data.frame(project="ofbiz",
+                     gini="low",
                      accuracy=mean(tempor$accuracy,na.rm = TRUE), 
                      myrecall=mean(tempor$myrecall,na.rm = TRUE),
                      myprecision=mean(tempor$myprecision,na.rm = TRUE),
                      f1=mean(tempor$f1,na.rm = TRUE),
                      auc=mean(tempor$auc,na.rm = TRUE),
-                     test="high")
+                     test="low")
 
-jackrabbit12 <- data.frame(project="jackrabbit",
-                   gini="low",
+wicket12 <- data.frame(project="wicket",
+                   gini="high",
                    accuracy=mean(tempor$accuracy,na.rm = TRUE), 
                    myrecall=mean(tempor$myrecall,na.rm = TRUE),
                    myprecision=mean(tempor$myprecision,na.rm = TRUE),
                    f1=mean(tempor$f1,na.rm = TRUE),
                    auc=mean(tempor$auc,na.rm = TRUE),
-                   test="low")
+                   test="high")
 
 portability <- data.frame(train=character(),
                      test=character(), 
@@ -162,29 +174,82 @@ portability <- data.frame(train=character(),
                      myrecall=double(),
                      myprecision=double(),
                      f1=double(),
-                     auc=double()) 
+                     auc=double(),
+                     test=character()) 
 
 
 portability=rbind(portability,camel12)
-portability=rbind(portability,continuum12)
 portability=rbind(portability,hadoop12)
 portability=rbind(portability,isis12)
 portability=rbind(portability,jackrabbit12)
+portability=rbind(portability,ofbiz12)
+portability=rbind(portability,wicket12)
 
-portability$test<- c("low", "high", "high", "low", "high")
+#portability$test<- c("low", "high", "high", "low", "high")
 
 
 write.csv(portability, file = "portability.csv")
 
 ##Barplots
-qplot(project, data=portability,geom="bar", weight=f1,xlab='',ylab="F1",fill=project)+
-  facet_wrap(~gini)
-qplot(project, data=portability,geom="bar", weight=auc,xlab='',ylab="AUC",fill=project)+
-  facet_wrap(~gini)
+qplot(project, data=portability,geom="bar", weight=f1/2,xlab='',ylab="F1",fill=project)+
+  facet_wrap(~gini,scale="free")+
+  coord_cartesian(ylim=c(0,0.6))+
+  theme(text = element_text(size=30))+
+  theme(axis.text.x=element_text(angle=90))+
+  guides(fill=FALSE)
 
+qplot(project, data=portability,geom="bar", weight=auc/2,xlab='',ylab="AUC",fill=project)+
+  facet_wrap(~gini,scale="free")+
+  coord_cartesian(ylim=c(0,1))+
+  theme(text = element_text(size=30))+
+  theme(axis.text.x=element_text(angle=90))+
+  guides(fill=FALSE)
 ##Boxplot
-qplot(x=project,y=f1,ylab="F1",fill=gini,data = portability,geom='boxplot')+
-  facet_wrap(~gini,scale="free")
+qplot(x=gini,y=f1,ylab="F1",fill=gini,data = portability,geom='boxplot',xlab='')+
+  coord_cartesian(ylim=c(0,0.3))+
+  facet_wrap(~gini,scale="free")+
+  theme(text = element_text(size=30),axis.text.x=element_blank())+
+  guides(fill=FALSE)
+
+
+qplot(x=gini,y=auc,ylab="AUC",fill=gini,data = portability,geom='boxplot',xlab='')+
+  coord_cartesian(ylim=c(0,1))+
+  facet_wrap(~gini,scale="free")+
+  theme(text = element_text(size=30),axis.text.x=element_blank())+
+  guides(fill=FALSE)
+
+#portability=read.csv("portability.csv",sep=",",header = TRUE)
+
+
+qplot(x=id,y=auc,ylab="AUC",fill=gini,data = portability,geom='boxplot',xlab='')+
+  coord_cartesian(ylim=c(0,1))+
+  facet_wrap(~gini,scale="free")+
+  theme(text = element_text(size=30))+
+  theme(axis.text.x=element_text(angle=90))+
+  guides(fill=FALSE)
+
+qplot(x=id,y=f1,ylab="F1",fill=gini,data = portability,geom='boxplot',xlab='')+
+  coord_cartesian(ylim=c(0,1))+
+  facet_wrap(~gini,scale="free")+
+  theme(text = element_text(size=30))+
+  theme(axis.text.x=element_text(angle=90))+
+  guides(fill=FALSE)
+
+portability$id[portability$gini=="High Gini"& portability$test=="Low Gini"]="3"
+portability$id[portability$gini=="High Gini"& portability$test=="Low Gini"]="1"
+portability$id[portability$gini=="Low Gini"& portability$test=="Low Gini"]="2"
+portability$id[portability$gini=="Low Gini"& portability$test=="High Gini"]="4"
+
+portability$id[!(portability$gini=="Low Gini"& portability$test=="Low Gini")]="0"
+
+
+
+portability$id[portability$id==1]="High to High"
+portability$id[portability$id==2]="Low to Low"
+portability$id[portability$id==3]="High to Low"
+portability$id[portability$id==4]="Low to High"
+
+
 
 
 
