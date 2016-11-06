@@ -24,6 +24,9 @@ comm <- list()
 adev <- list()
 add <-list()
 del<-list()
+ddev <- list()
+own <- list()
+minor <- list()
 
 
 aucProjects <- list()
@@ -32,6 +35,9 @@ adevProjects <- list()
 commProjects <- list()
 addProjects <- list()
 delProjects <- list()
+ddevProjects <- list()
+ownProjects <- list()
+minorProjects <- list()
 
 #path of the folder with the projects
 pathProject = "C:/Users/harri/Desktop/Master/Mining/projects/"
@@ -63,7 +69,7 @@ train$buggy = ifelse(train$buggy == "True" & train$bug_discovered_after_next_rel
 test$buggy = ifelse(test$buggy == "True", 1, 0);
 
 # Build a logistic regression model
-model <- glm(buggy ~ comm + add + del, data = train , family = binomial(link = "logit"))
+model <- glm(buggy ~ comm + add + del + ddev + adev + own + minor, data = train , family = binomial(link = "logit"))
 
 # Get labels for test data using the LR model
 result <- predict(model,newdata=test,type='response')
@@ -248,9 +254,3 @@ portability$id[portability$id==1]="High to High"
 portability$id[portability$id==2]="Low to Low"
 portability$id[portability$id==3]="High to Low"
 portability$id[portability$id==4]="Low to High"
-
-
-
-
-
-
