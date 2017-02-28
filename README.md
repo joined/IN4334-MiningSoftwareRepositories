@@ -2,7 +2,7 @@
 
 This repository contains the code of the assignments and of the final paper of the course IN4334 "Mining Software Repositories" at TU Delft, taught in Q1 2016/17.
 
-In collaboration with @MiliasV, @ajayaadhikari and @Harrisval.
+In collaboration with [@MiliasV](https://github.com/MiliasV), @ajayaadhikari and @Harrisval.
 
 ## Assignments
 
